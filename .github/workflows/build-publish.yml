@@ -27,14 +27,16 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: compute image tag
-      id: image-tags
+      id: image-metadata
       run: |
         set -eux -o pipefail
+
         bitnami_containers_sha="$(git submodule status bitnami-containers | cut -d' ' -f2)"
-        echo "permanent-tag=$(date +"%Y-%m-%dT%H.%M.%S")_${bitnami_containers_sha:0:7}" >>$GITHUB_OUTPUT
-    # - name: compute Docker image OCI metadata from commit & repo
-    #   id: image-metadata
-    #   uses: docker/metadata-action@v5
+        bitnami_containers_sha="${bitnami_containers_sha:0:7}"
+        echo "permanent-tag=$(date +"%Y-%m-%dT%H.%M.%S")_$bitnami_containers_sha" >>$GITHUB_OUTPUT
+
+        echo "documentation-url=https://github.com/bitnami/containers/tree/$bitnami_containers_sha/bitnami/pgbouncer/README.md" >>$GITHUB_OUTPUT
+        echo "source-url=https://github.com/${{ github.repository }}/tree/${GITHUB_SHA:0:7}" >>$GITHUB_OUTPUT
 
     - name: build and push image
       uses: docker/build-push-action@v6
@@ -43,8 +45,13 @@ jobs:
         push: true
         tags: |
           ghcr.io/mobidata-bw/pgbouncer:latest
-          ghcr.io/mobidata-bw/pgbouncer:${{ steps.image-tags.outputs.permanent-tag }}
-        # labels: ${{ steps.image-metadata.outputs.labels }}
+          ghcr.io/mobidata-bw/pgbouncer:${{ steps.image-metadata.outputs.permanent-tag }}
+        # We override some of bitnami's labels here. Most of theirs are helpful though.
+        labels: |
+          org.opencontainers.image.description=Lightweight connection pooler for PostgreSQL
+          org.opencontainers.image.documentation=${{ steps.image-metadata.outputs.documentation-url }}
+          org.opencontainers.image.source=${{ steps.image-metadata.outputs.source-url }}
+          org.opencontainers.image.vendor=MobiData-BW & Broadcom, Inc.
         platforms: linux/amd64,linux/arm64
         # https://docs.docker.com/build/ci/github-actions/cache/#cache-backend-api
         cache-from: type=gha
