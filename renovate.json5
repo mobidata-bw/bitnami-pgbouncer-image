@@ -6,4 +6,7 @@
 	"git-submodules": {
 		"enabled": true,
 	},
+	// run Renovate Bot less often
+	"timezone": "Europe/Berlin",
+	"schedule": "10 07 * * 2", // every Tuesday at 07:10
 }
