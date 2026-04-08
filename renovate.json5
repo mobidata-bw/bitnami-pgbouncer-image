@@ -8,5 +8,6 @@
 	},
 	// run Renovate Bot less often
 	"timezone": "Europe/Berlin",
-	"schedule": "10 07 * * 2", // every Tuesday at 07:10
+	// Note: Renovate bot must have `*` for the minutes.
+	"schedule": "* 07 * * 2", // every Tuesday at 7am
 }
