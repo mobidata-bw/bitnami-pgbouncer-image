@@ -39,7 +39,7 @@ jobs:
         echo "source-url=https://github.com/${{ github.repository }}/tree/${GITHUB_SHA:0:7}" >>$GITHUB_OUTPUT
 
     - name: build and push image
-      uses: docker/build-push-action@v6
+      uses: docker/build-push-action@v7
       with:
         context: bitnami-containers/bitnami/pgbouncer/1/debian-12
         push: true
